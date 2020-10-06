@@ -1,0 +1,9 @@
+{
+  "client_id": "your client id",
+  "client_secret": "your client secret",
+  "url": {
+    "redirect": "app redirect url"
+  },
+  "site": "site ID",
+  "downloadDir": "download directory where the images should be downlaoded"
+}
