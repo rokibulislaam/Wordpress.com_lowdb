@@ -4,7 +4,7 @@
 
 - Store posts from wordpress.com (could be private site also) locally
 - Store the images of the posts locally, or serve with own CDN
-- Create a RESTful API from the stored posts because using wordpress.com API could be slower in certain cicumstances
+- Create a RESTful API from the stored posts because using wordpress.com API could be slower in certain circumstances
 - Whatever you want to add...
 
 ### Key Dependencies
@@ -57,4 +57,4 @@ $ npm start
 
 Want to contribute? Great!
 
-Wordpress.com_lowdb is a experimental project for the time bening. You are welcome to add any new feature. Make it robus and flexible so that it can be used in production projects.
+Wordpress.com_lowdb is a experimental project for the time bening. You are welcome to add any new feature. Make it robust and flexible so that it can be used in production projects.
