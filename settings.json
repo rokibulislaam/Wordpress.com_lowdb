@@ -1,0 +1,10 @@
+{
+  "client_id": "<your client id>",
+  "client_secret": "<your client secret>",
+  "url": {
+    "redirect": "<app redirect url>"
+  },
+  "site": "site ID",
+  "downloadDir": "download directory where the images should be downlaoded",
+  "site_url": " 'absolute url' of the new site, it will be used to serve the images stored locally, e.g. https://newsite.com/03/43/someimage.jpg"
+}
