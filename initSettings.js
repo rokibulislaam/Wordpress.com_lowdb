@@ -1,10 +1,12 @@
 const fetch = require('node-fetch');
 const FormData = require('form-data');
 const settings = require('./settings');
+const settingsJSON = require('./wp_com_settings.json');
 const fs = require('fs');
 const path = require('path');
 const { parse, stringify } = require('envfile');
 const { prompt } = require('enquirer');
+const { options } = require('./routes/fetchFromWP');
 const initialPrompt = prompt([
   {
     type: 'input',
@@ -105,6 +107,14 @@ initialPrompt
           .then((response) => response.json())
           .then((result) => {
             console.log(`Access Token: ${result.access_token}`);
+            if (
+              !result.access_token ||
+              typeof result.access_token == 'undefined'
+            ) {
+              console.log(
+                '\nPlease startover the process again, you might have type the username or password incorrect\n'
+              );
+            }
             try {
               fs.readFile(
                 '.env',
@@ -138,6 +148,66 @@ initialPrompt
               console.error(err);
               return;
             }
+          })
+          .then(async () => {
+            const dotenv = require('dotenv').config('./.env');
+            const wpcom = require('wpcom')(
+              dotenv.parsed.WP_COM_ACCESS_TOKEN || ''
+            );
+            await wpcom.req.get('/me/sites').then(async (response) => {
+              const siteOptions = response.sites.map((site) =>
+                JSON.stringify({
+                  ID: site.ID,
+                  Name: site.name,
+                  Description: site.description,
+                })
+              );
+              const { Select } = require('enquirer');
+              const siteSelectionPrompt = new Select({
+                name: 'site',
+                message: 'Please select the site you want to clone',
+                choices: [...siteOptions],
+              });
+              await siteSelectionPrompt
+                .run()
+                .then((userResponse) => {
+                  const selectionList = JSON.parse(userResponse);
+                  settingsJSON.site = selectionList.ID;
+                })
+                .catch(console.error);
+            });
+          })
+          .then(() => {
+            const settingsPrompt = prompt([
+              {
+                type: 'input',
+                name: 'downloadDir',
+                message:
+                  'Enter the name of the folder where the images of wordpress.com should be downloaded',
+                default: 'wp_files',
+                required: true,
+              },
+              {
+                type: 'input',
+                name: 'site_url',
+                message:
+                  'Enter the new URL, all the documents from wordpress.com will be replaced with the new url. Example: https://newurl.com/images/some_image_480x720.jpg',
+                default: '',
+                required: true,
+              },
+            ]);
+            settingsPrompt.then((userResponse) => {
+              settingsJSON.downloadDir = userResponse.downloadDir;
+              settingsJSON.site_url = userResponse.site_url;
+              fs.writeFileSync(
+                path.join(__dirname, 'wp_com_settings.json'),
+                JSON.stringify(settingsJSON),
+                {
+                  encoding: 'utf8',
+                  flag: 'w+',
+                }
+              );
+            });
           })
           .catch((error) => console.error('\n\nERROR ENCOUNTERED\n\n', error));
       })
